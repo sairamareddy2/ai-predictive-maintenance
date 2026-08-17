@@ -3,7 +3,11 @@ import sys
 import os
 import pandas as pd
 
-# Allow dashboard to access src
+
+# =========================================================
+# PROJECT PATH
+# =========================================================
+
 sys.path.append(
     os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "src")
@@ -17,37 +21,159 @@ from prediction import (
 )
 
 
-# ==========================================
-# Page Configuration
-# ==========================================
+# =========================================================
+# PAGE CONFIGURATION
+# =========================================================
 
 st.set_page_config(
-    page_title="Predictive Maintenance System",
+    page_title="AI Predictive Maintenance",
     page_icon="⚙️",
-    layout="wide"
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
 
 
-# ==========================================
-# Title
-# ==========================================
+# =========================================================
+# CUSTOM CSS
+# =========================================================
 
-st.title("⚙️ Predictive Maintenance System")
+st.markdown(
+    """
+    <style>
+
+    .main-title {
+        font-size: 38px;
+        font-weight: 700;
+        margin-bottom: 5px;
+    }
+
+    .subtitle {
+        font-size: 17px;
+        margin-bottom: 25px;
+    }
+
+    .section-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-top: 15px;
+        margin-bottom: 15px;
+    }
+
+    .normal-box {
+        padding: 18px;
+        border-radius: 10px;
+        border: 1px solid #2e7d32;
+        text-align: center;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .warning-box {
+        padding: 18px;
+        border-radius: 10px;
+        border: 1px solid #f9a825;
+        text-align: center;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .critical-box {
+        padding: 18px;
+        border-radius: 10px;
+        border: 1px solid #c62828;
+        text-align: center;
+        font-size: 20px;
+        font-weight: 600;
+    }
+
+    .footer {
+        text-align: center;
+        margin-top: 40px;
+        padding: 15px;
+        font-size: 13px;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
+
+# =========================================================
+# HEADER
+# =========================================================
+
+st.markdown(
+    '<div class="main-title">⚙️ AI Predictive Maintenance System</div>',
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    '<div class="subtitle">'
+    'Industrial equipment health monitoring and failure prediction '
+    'using Machine Learning.'
+    '</div>',
+    unsafe_allow_html=True
+)
+
+st.divider()
+
+
+# =========================================================
+# SIDEBAR - MODEL INFORMATION
+# =========================================================
+
+with st.sidebar:
+
+    st.header("🤖 Model Information")
+
+    st.write("**Model:** Random Forest")
+    st.write("**Model Type:** Classification")
+    st.write("**Number of Trees:** 200")
+    st.write("**Input Features:** 8")
+    st.write("**Training Records:** 8,000")
+    st.write("**Testing Records:** 2,000")
+
+    st.divider()
+
+    st.subheader("📊 Model Performance")
+
+    st.metric(
+        "Test Accuracy",
+        "97.95%"
+    )
+
+    st.metric(
+        "Failure Recall",
+        "64.71%"
+    )
+
+    st.divider()
+
+    st.caption(
+        "Prototype developed for AI-based predictive maintenance."
+    )
+
+
+# =========================================================
+# EQUIPMENT INPUT SECTION
+# =========================================================
+
+st.markdown(
+    '<div class="section-title">🔧 Equipment Sensor Inputs</div>',
+    unsafe_allow_html=True
+)
 
 st.write(
-    "AI-based industrial equipment health monitoring "
-    "and failure prediction system."
+    "Enter the current operating conditions of the equipment."
 )
-
-
-# ==========================================
-# Sensor Input Section
-# ==========================================
-
-st.header("Equipment Sensor Data")
 
 col1, col2 = st.columns(2)
 
+
+# ---------------------------------------------------------
+# LEFT COLUMN
+# ---------------------------------------------------------
 
 with col1:
 
@@ -76,6 +202,10 @@ with col1:
     )
 
 
+# ---------------------------------------------------------
+# RIGHT COLUMN
+# ---------------------------------------------------------
+
 with col2:
 
     torque = st.number_input(
@@ -100,11 +230,25 @@ with col2:
     )
 
 
-# ==========================================
-# Prediction Button
-# ==========================================
+st.write("")
 
-if st.button("🔍 Predict Equipment Health"):
+
+# =========================================================
+# PREDICTION BUTTON
+# =========================================================
+
+predict_button = st.button(
+    "🔍 Analyze Equipment Health",
+    use_container_width=True,
+    type="primary"
+)
+
+
+# =========================================================
+# PREDICTION
+# =========================================================
+
+if predict_button:
 
     prediction, probability = predict_machine_failure(
         air_temperature,
@@ -122,114 +266,206 @@ if st.button("🔍 Predict Equipment Health"):
     )
 
 
-    # ==========================================
-# Results
-# ==========================================
+    st.divider()
 
-st.header("Prediction Results")
 
-result_col1, result_col2, result_col3 = st.columns(3)
+    # =====================================================
+    # RESULTS HEADER
+    # =====================================================
 
-with result_col1:
-    st.metric(
-        "Failure Probability",
-        f"{probability * 100:.1f}%"
-    )
-
-with result_col2:
-    st.metric(
-        "Prediction",
-        "FAILURE" if prediction == 1 else "NORMAL"
-    )
-
-with result_col3:
-    st.metric(
-        "Risk Level",
-        risk_level
+    st.markdown(
+        '<div class="section-title">📊 Equipment Health Assessment</div>',
+        unsafe_allow_html=True
     )
 
 
-# ==========================================
-# Health Status
-# ==========================================
+    # =====================================================
+    # RESULT METRICS
+    # =====================================================
 
-st.subheader("Equipment Health")
-
-if risk_level == "CRITICAL":
-
-    st.error("🔴 CRITICAL — Immediate maintenance required.")
-
-elif risk_level == "WARNING":
-
-    st.warning("🟡 WARNING — Maintenance inspection recommended.")
-
-else:
-
-    st.success("🟢 NORMAL — Equipment operating normally.")
+    result_col1, result_col2, result_col3 = st.columns(3)
 
 
-# ==========================================
-# Failure Probability
-# ==========================================
+    with result_col1:
 
-st.subheader("Failure Probability")
-
-st.progress(
-    float(probability)
-)
-
-st.write(
-    f"Current predicted failure probability: "
-    f"**{probability * 100:.1f}%**"
-)
+        st.metric(
+            "Failure Probability",
+            f"{probability * 100:.1f}%"
+        )
 
 
-# ==========================================
-# Maintenance Recommendation
-# ==========================================
+    with result_col2:
 
-st.subheader("Maintenance Recommendation")
+        prediction_text = (
+            "FAILURE"
+            if prediction == 1
+            else "NORMAL"
+        )
 
-if risk_level == "CRITICAL":
-
-    st.error(recommendation)
-
-elif risk_level == "WARNING":
-
-    st.warning(recommendation)
-
-else:
-
-    st.success(recommendation)
+        st.metric(
+            "Prediction",
+            prediction_text
+        )
 
 
-# ==========================================
-# Sensor Summary
-# ==========================================
+    with result_col3:
 
-st.subheader("Current Sensor Readings")
+        st.metric(
+            "Risk Level",
+            risk_level
+        )
 
-sensor_data = pd.DataFrame({
-    "Parameter": [
-        "Air Temperature [K]",
-        "Process Temperature [K]",
-        "Rotational Speed [rpm]",
-        "Torque [Nm]",
-        "Tool Wear [min]",
-        "Machine Type"
-    ],
-    "Value": [
-        air_temperature,
-        process_temperature,
-        rotational_speed,
-        torque,
-        tool_wear,
-        machine_type
-    ]
-})
 
-st.dataframe(
-    sensor_data,
-    use_container_width=True,
-    hide_index=True
+    # =====================================================
+    # PROBABILITY BAR
+    # =====================================================
+
+    st.subheader("Failure Probability")
+
+    st.progress(
+        min(float(probability), 1.0)
+    )
+
+    st.write(
+        f"Predicted probability of equipment failure: "
+        f"**{probability * 100:.1f}%**"
+    )
+
+
+    # =====================================================
+    # HEALTH STATUS
+    # =====================================================
+
+    st.subheader("Equipment Health Status")
+
+
+    if risk_level == "CRITICAL":
+
+        st.markdown(
+            """
+            <div class="critical-box">
+            🔴 CRITICAL<br>
+            Immediate attention required
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.error(
+            recommendation
+        )
+
+
+    elif risk_level == "WARNING":
+
+        st.markdown(
+            """
+            <div class="warning-box">
+            🟡 WARNING<br>
+            Increased risk detected
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.warning(
+            recommendation
+        )
+
+
+    else:
+
+        st.markdown(
+            """
+            <div class="normal-box">
+            🟢 NORMAL<br>
+            Equipment operating normally
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.success(
+            recommendation
+        )
+
+
+    # =====================================================
+    # SENSOR SUMMARY
+    # =====================================================
+
+    st.subheader("📋 Current Sensor Readings")
+
+
+    sensor_data = pd.DataFrame(
+        {
+            "Parameter": [
+                "Air Temperature",
+                "Process Temperature",
+                "Rotational Speed",
+                "Torque",
+                "Tool Wear",
+                "Machine Type"
+            ],
+
+            "Value": [
+                f"{air_temperature:.1f} K",
+                f"{process_temperature:.1f} K",
+                f"{rotational_speed} rpm",
+                f"{torque:.1f} Nm",
+                f"{tool_wear} min",
+                machine_type
+            ]
+        }
+    )
+
+
+    st.dataframe(
+        sensor_data,
+        use_container_width=True,
+        hide_index=True
+    )
+
+
+    # =====================================================
+    # MAINTENANCE ACTION
+    # =====================================================
+
+    st.subheader("🔧 Recommended Maintenance Action")
+
+    if risk_level == "CRITICAL":
+
+        st.error(
+            "Immediate maintenance required. "
+            "Inspect the equipment before continued operation."
+        )
+
+    elif risk_level == "WARNING":
+
+        st.warning(
+            "Schedule a maintenance inspection soon "
+            "and continue monitoring equipment condition."
+        )
+
+    else:
+
+        st.success(
+            "No immediate maintenance action required. "
+            "Continue routine monitoring."
+        )
+
+
+# =========================================================
+# FOOTER
+# =========================================================
+
+st.divider()
+
+st.markdown(
+    '<div class="footer">'
+    'AI Predictive Maintenance System | '
+    'Random Forest Machine Learning Model | '
+    'Internship Project Prototype'
+    '</div>',
+    unsafe_allow_html=True
 )
